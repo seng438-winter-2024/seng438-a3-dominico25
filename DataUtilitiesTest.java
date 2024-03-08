@@ -20,6 +20,8 @@ public class DataUtilitiesTest extends DataUtilities {
 	private Values2D validValues;
 	private Values2D nullValues;
 	private Values2D negativeValues;
+	private Values2D singleColumnValues;
+	private Values2D singleRowValues;
 	
 	@BeforeClass public static void setUpBeforeClass() throws Exception { }
 	
@@ -103,8 +105,50 @@ public class DataUtilitiesTest extends DataUtilities {
                  one(singleValues).getValue(0, 0);
                  will(returnValue(3.0));
              }
-         });
+        });
+        
+        
+        Mockery singleColumnMockingContext = new Mockery();
+        singleColumnValues = singleColumnMockingContext.mock(Values2D.class);
+        singleColumnMockingContext.checking(new Expectations() {
+            {
+                one(singleColumnValues).getColumnCount();
+                will(returnValue(1));
+                one(singleColumnValues).getRowCount();
+                will(returnValue(0));
+                one(singleValues).getValue(0, 0);
+                will(returnValue(3.0));
+            }
+        });
+
+        Mockery singleRowMockingContext = new Mockery();
+        singleRowValues = singleRowMockingContext.mock(Values2D.class);
+        singleRowMockingContext.checking(new Expectations() {
+            {
+                one(singleRowValues).getRowCount();
+                will(returnValue(1));
+                one(singleRowValues).getColumnCount();
+                will(returnValue(0));
+                one(singleValues).getValue(0, 0);
+                will(returnValue(3.0));
+            }
+        });
 	}
+	
+	/**
+	 * Testing calculateColumnTotal with a single column and no rows 
+	 */
+	@Test
+	public void testCalculateColumnTotalSingleColumn() {
+		
+		
+		double expected = 3.0;
+	    double result = DataUtilities.calculateColumnTotal(singleColumnValues, 0);
+
+	    assertEquals(expected, result, .000000001d);
+
+	}
+	
 	
 	/**
 	 * Testing calculateColumnTotal for a column with 2 rows and double type values.
@@ -115,9 +159,10 @@ public class DataUtilitiesTest extends DataUtilities {
 	public void testCalculateColumnTotalForTwoValues() {
 
 	     double result = DataUtilities.calculateColumnTotal(validValues, 0);
-	     // verify
-	     assertEquals("Expected total: 10.0 but was " + result, 10.0, result, .000000001d);
-	     // tear-down: NONE in this test method
+	     double expected = 10.0;
+
+	     assertEquals("Two rows and double type total is not calculated correctly", expected, result, .000000001d);
+
 	}
 	
 	/**
@@ -128,8 +173,9 @@ public class DataUtilitiesTest extends DataUtilities {
 	public void testCalculateColTotalForNegativeValues() {
 		
 		double result = DataUtilities.calculateColumnTotal(negativeValues, 1);
+		double expected = -15.0;
 		
-		assertEquals("Expected total: -15.0 but was " + result, -15.0, result, .000000001d);
+		assertEquals("Column total with negative values is calculated incorrectly", expected, result, .000000001d);
 	}
 	
 	/**
@@ -179,8 +225,8 @@ public class DataUtilitiesTest extends DataUtilities {
 	@Test
 	public void testRowTotalWithTwoDoubleValues() {
 		double result = DataUtilities.calculateRowTotal(validValues, 0);
-		assertEquals("Expected total: 15.0 but was " + result, 15.0, result, .000000001d);
-		
+		double expected = 15.0;
+		assertEquals("Row total with two columns was calculated incorrectly", expected, result, .000000001d);
 	}
 	
 	/**
@@ -190,7 +236,8 @@ public class DataUtilitiesTest extends DataUtilities {
 	@Test
 	public void testRowTotalWithTwoNegatives() {
 		double result = DataUtilities.calculateRowTotal(negativeValues, 2);
-		assertEquals("Expected total: -9.0 but was " + result, -9.0, result, .000000001d);
+		double expected = -9.0;
+		assertEquals("Row total inccorect for two negative values", expected, result, .000000001d);
 	}
 	
 	/**
@@ -232,7 +279,6 @@ public class DataUtilitiesTest extends DataUtilities {
 	     }
 	}
 	
-	
 	/**
      * Testing calculateRowTotal with a row with a single value.
      * Single mock data column index=0 contains value 3. The total should be 3.0.
@@ -240,7 +286,8 @@ public class DataUtilitiesTest extends DataUtilities {
     @Test
     public void testRowTotalSingleValue() {
         double result = DataUtilities.calculateRowTotal(singleValues, 0);
-        assertEquals("Expected total: 3.0 but was " + result, 3.0, result, .000000001d);
+        double expected = 3.0;
+        assertEquals("Incorrect return for single value in a row", expected, result, .000000001d);
     }
 	
     /**
